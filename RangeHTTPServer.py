@@ -58,6 +58,12 @@ class RangeHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     """
 
     server_version = "RangeHTTP/" + __version__
+    
+    def do_OPTIONS(self):
+      self.send_response(200, "ok")
+      self.send_header("Access-Control-Allow-Origin", self.headers.dict["origin"])
+      self.send_header("Access-Control-Allow-Headers", "Range")
+      self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 
     def do_GET(self):
         """Serve a GET request."""
@@ -142,6 +148,7 @@ class RangeHTTPRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 ei = int(e)
                 if ei < size:
                     start_range = size - ei
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Content-Range", 'bytes ' + str(start_range) + '-' + str(end_range - 1) + '/' + str(size))
         self.send_header("Content-Length", end_range - start_range)
         self.send_header("Last-Modified", self.date_time_string(fs.st_mtime))
